@@ -1,6 +1,6 @@
 # VeriCorp Custom GPT
 
-Custom GPT for European company verification via the [VeriCorp API](https://rapidapi.com/vericorp/api/vericorp-api).
+Custom GPT for European company verification via the [VeriCorp API](https://rapidapi.com/vericorptestcollab/api/vericorp).
 
 ## Setup
 
