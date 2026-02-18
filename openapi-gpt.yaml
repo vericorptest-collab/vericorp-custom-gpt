@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: VeriCorp API
+  description: Validate and enrich European company data. 27 EU countries + UK.
+  version: 1.0.0
+servers:
+  - url: https://vericorp-api.p.rapidapi.com
+
+paths:
+  /v1/company/{tax_id}:
+    get:
+      summary: Look up company by tax ID
+      description: Returns company name, address, legal form, status, directors, and more. Supports 28 countries.
+      operationId: getCompany
+      parameters:
+        - name: tax_id
+          in: path
+          required: true
+          description: "Tax ID with country prefix (e.g., PT502011378, DK10150817, DE811871080)"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Company data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tax_id: { type: string }
+                  country: { type: string }
+                  name: { type: string }
+                  address:
+                    type: object
+                    properties:
+                      street: { type: string }
+                      city: { type: string }
+                      postal_code: { type: string }
+                      country: { type: string }
+                  legal_form: { type: string }
+                  status: { type: string }
+                  incorporation_date: { type: string }
+                  activity_code: { type: string }
+                  activity_description: { type: string }
+                  source: { type: string }
+                  data_quality: { type: string }
+                  vat_valid: { type: boolean }
+        "404":
+          description: Company not found
+
+  /v1/company/gb/{company_number}:
+    get:
+      summary: Look up UK company by number
+      description: Returns UK company data including directors and persons with significant control.
+      operationId: getCompanyGB
+      parameters:
+        - name: company_number
+          in: path
+          required: true
+          description: "UK Companies House number (e.g., 00445790)"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Company data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tax_id: { type: string }
+                  country: { type: string }
+                  name: { type: string }
+                  address: { type: object }
+                  directors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name: { type: string }
+                        role: { type: string }
+                  psc:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name: { type: string }
+                        natures_of_control:
+                          type: array
+                          items: { type: string }
+
+  /v1/validate/{tax_id}:
+    get:
+      summary: Validate a VAT number
+      description: Checks format locally and verifies against VIES. Returns validity and company name if valid.
+      operationId: validateVat
+      parameters:
+        - name: tax_id
+          in: path
+          required: true
+          description: "VAT number with country prefix (e.g., PT502011378, DE123456789)"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tax_id: { type: string }
+                  country: { type: string }
+                  format_valid: { type: boolean }
+                  vat_valid: { type: boolean }
+                  company_name: { type: string }
+
+  /v1/countries:
+    get:
+      summary: List supported countries
+      description: Returns all supported countries with enrichment capabilities.
+      operationId: getCountries
+      responses:
+        "200":
+          description: Countries list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total: { type: integer }
+                  enriched: { type: integer }
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code: { type: string }
+                        name: { type: string }
+                        enriched: { type: boolean }
